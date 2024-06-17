@@ -75,14 +75,14 @@ const UserProfile = () => {
           <Sidebar />
           <div className="user-profile-container">
           <div className="user-actions">
-              {authUser && (authUser.email !== 'moderator.hotfix@gmail.com' && authUser.email === userProfile.email) && (
+              {authUser && (authUser.email === userProfile.email) && (
                 <IconButton onClick={EditProfile}>
                                     <EditIcon />
                                 </IconButton>
                
 
               )}
-              {authUser && (authUser.email !== 'moderator.hotfix@gmail.com' && authUser.email === userProfile.email) && (
+              {authUser && (authUser.email === userProfile.email) && (
                 <IconButton onClick={() => handleUserDelete(userProfile._id)}>
                                     <DeleteIcon />
                                 </IconButton>
@@ -102,11 +102,6 @@ const UserProfile = () => {
 
               </div>
             </div>
-
-           
-
-           
-
             <div className="tab-content">
 
            <div className='button-container-pf'>

@@ -13,6 +13,9 @@ import { selectUser } from '../../features/userSlice';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
+import { backendUrl } from '../../utils/Config';
+import io from 'socket.io-client';
+
 function MainBlog({ id }) {
 
     const authUser = useSelector(selectUser);
@@ -26,6 +29,8 @@ function MainBlog({ id }) {
     const [userHasUpvoted, setUserHasUpvoted] = useState(false);
     const [userHasDownvoted, setUserHasDownvoted] = useState(false);
 
+    const socket = io(backendUrl); 
+
     const handleAddComment = async () => {
         try {
             if (comment.trim() !== '') {
@@ -33,11 +38,11 @@ function MainBlog({ id }) {
                     body: comment,
                     blog: id
                 }
-                await addComment(com);
-                const comnt = await AllcommentsByBlog(id);
+                let newcmnt = await addComment(com);
+                newcmnt.toshow = true;
+                socket.emit('newComment', newcmnt);
                 setComment('');
                 setshow(false);
-                setAllComments(comnt.comments);
             }
             else {
                 alert("plese fill comment");
@@ -59,9 +64,9 @@ function MainBlog({ id }) {
     const handleCommentDelete = async (cid) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this Comment?');
         if (confirmDelete) {
-            await deleteComment(cid);
-            const cmnts = await AllcommentsByBlog(id);
-            setAllComments(cmnts.comments);
+            let deletedcmnt = await deleteComment(cid);
+            deletedcmnt.toshow = false;
+            socket.emit('deleteComment', deletedcmnt);
         }
     };
 
@@ -82,7 +87,8 @@ function MainBlog({ id }) {
                     setUserHasUpvoted(true);
                     setUserHasDownvoted(false);
                 }
-                setLike(len);
+                let data = { count: len, question: id };
+                socket.emit('toggleVote', data);
             }
             else {
                 alert("you already voted the blog");
@@ -105,7 +111,8 @@ function MainBlog({ id }) {
                     setUserHasDownvoted(true);
                     setUserHasUpvoted(false);
                 }
-                setLike(len);
+                let data = { count: len, blog: id };
+                socket.emit('toggleVote', data);
             }
             else {
                 alert("you already voted the blog");
@@ -143,6 +150,31 @@ function MainBlog({ id }) {
         };
 
         fetchData();
+
+        // Listen for new comments
+        socket.on('liveComments', (comment) => {
+            if (comment.blog === id) {
+                if (comment.toshow === true) {
+                    setAllComments((prevComments) => [...prevComments, comment]);
+                }
+                else {
+                    setAllComments((prevComments) => prevComments.filter((cmnt) => cmnt._id !== comment._id));
+                }
+            }
+        });
+
+        // Listen for vote toggles
+        socket.on('liveVotes', (data) => {
+            if (data.blog === id) {
+                setLike(data.count);
+            }
+        });
+
+        return () => {
+            socket.off('liveComments');
+            socket.off('liveVotes');
+        };
+
     }, [id]);
 
     useEffect(() => {
@@ -170,7 +202,7 @@ function MainBlog({ id }) {
                 <div className='main-desc'>
                     <div className='info'>
                     <p>
-                            {(authUser.email === 'moderator.hotfix@gmail.com' || owner.email === authUser.email) && (
+                            {(owner.email === authUser.email) && (
                                 <IconButton onClick={() => handleEditBlog(id)}>
                                     <EditIcon />
                                 </IconButton>
@@ -178,7 +210,7 @@ function MainBlog({ id }) {
                         </p>
 
                         <p>
-                            {(authUser.email === 'moderator.hotfix@gmail.com' || owner.email === authUser.email) && (
+                            {(owner.email === authUser.email) && (
                                 <IconButton onClick={() => handleBlogDelete(blog._id)}>
                                     <DeleteIcon />
                                 </IconButton>
@@ -223,7 +255,7 @@ function MainBlog({ id }) {
                                             <span><Link to={`/user/${cmnt.user}`}>{cmnt.name}</Link></span> : {cmnt.body}
                                                 <small> at {cmnt.created_at.split("T")[0]}</small>
                                             </p>
-                                            <p>{(authUser.email === 'moderator.hotfix@gmail.com' || cmnt.email === authUser.email) && ( <Link onClick={() => handleCommentDelete(cmnt._id)} className="delete-link">delete</Link>)}</p>
+                                            <p>{(cmnt.email === authUser.email) && ( <Link onClick={() => handleCommentDelete(cmnt._id)} className="delete-link">delete</Link>)}</p>
                                         </div>
                                     ))}
 

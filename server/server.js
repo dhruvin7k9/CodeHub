@@ -6,10 +6,10 @@ const path = require("path");
 const JwtStrategy = require("passport-jwt").Strategy,
     ExtractJwt = require("passport-jwt").ExtractJwt;
 const passport = require("passport");
+const http = require('http');
+const socketIo = require('socket.io');
+
 const Users = require('./models/User.js');
-
-
-
 const db = require("./DatabaseConnection.js");
 const authRouter = require("./routes/AuthRoutes.js");
 const questionRouter = require("./routes/QuestionRoutes.js");
@@ -23,17 +23,29 @@ const PORT = process.env.PORT || 80
 // DB connection
 db.connect();
 
+const server = http.createServer(app);
+const io = socketIo(server, {
+    cors: {
+        origin: ['http://localhost:3000', 'https://ask-me-dev.vercel.app'],
+        methods: ["GET", "POST"]
+    }
+});
 
 // Middleware
 app.use(bodyParser.json({limit: "50mb"}))
 app.use(bodyParser.urlencoded({ extended : true, limit: "50mb"}))
 app.use(express.json())
-
+app.use(cookieParser());
 
 // Headers
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Headers", "*")
+    const allowedOrigins = ['http://localhost:3000', 'https://ask-me-dev.vercel.app'];
+    const origin = req.headers.origin;
+
+    if (allowedOrigins.includes(origin)) {
+        res.header("Access-Control-Allow-Origin", origin);
+    }
+
     next()
 })
 
@@ -59,7 +71,9 @@ passport.use(
 
 // Cors
 app.use(cors({
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+    origin: ['http://localhost:3000', 'https://ask-me-dev.vercel.app']
 }));
 
 
@@ -71,25 +85,37 @@ app.use("/codehub/comment", commentRouter);
 app.use("/codehub/blog", blogRouter);
 app.use("/codehub/answer", answerRouter);
 
-// Static resources
-// app.use('/upload', express.static(path.join(__dirname, '/../uploads')))
-// app.use(express.static(path.join(__dirname, '/../client/build')))
+// Socket.io
+io.on('connection', (socket) => {
+    console.log('New client connected');
 
-// app.get('*', (req, res) => {
-//     try {
-//         res.sendFile(path.join(`${__dirname}/..client/build/index.html`))
-//     } catch (e) {
-//         res.send('Oops ! an error occured')
-//     }
-// })
+    socket.on('newComment', (comment) => {
+        io.emit('liveComments', comment);
+    });
 
+    socket.on('deleteComment', (comment) => {
+        io.emit('liveComments', comment);
+    });
 
-app.get('/', (req,res)=>{
-    res.send("welcome to code hub");
-})
+    socket.on('newAnswer', (answer) => {
+        io.emit('liveAnswers', answer);
+    });
+
+    socket.on('deleteAnswer', (answer) => {
+        io.emit('liveAnswers', answer);
+    });
+
+    socket.on('toggleVote', (data) => {
+        io.emit('liveVotes', data);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
+});
 
 
 // Server listens
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`CODE HUB is running on PORT number : ${PORT}`)
 })

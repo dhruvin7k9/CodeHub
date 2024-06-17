@@ -160,7 +160,7 @@ function Header() {
           <Link to='/' className='headerlink'>
             <img src="\hotfixlogo.jpg" alt='logo' style={{ borderRadius: '50%', width: '50px', height: '50px' }} />
           </Link>
-          <span>CodeFix</span>
+          <span>AskMeDev</span>
         </div>
 
         <SearchComponent />

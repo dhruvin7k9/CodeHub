@@ -15,6 +15,9 @@ import { selectUser } from '../../features/userSlice';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
+import { backendUrl } from '../../utils/Config';
+import io from 'socket.io-client';
+
 function MainQuestion({ id }) {
 
     const authUser = useSelector(selectUser);
@@ -30,6 +33,8 @@ function MainQuestion({ id }) {
     const [userHasUpvoted, setUserHasUpvoted] = useState(false);
     const [userHasDownvoted, setUserHasDownvoted] = useState(false);
 
+    const socket = io(backendUrl); 
+
     const handlePostAnswer = async () => {
 
         if (!answer.trim()) {
@@ -37,10 +42,10 @@ function MainQuestion({ id }) {
             return;
         }
         const ans = { body: answer, question: id }
-        await addanswer(ans);
-        const answers = await fetchAllAnswers(id);
+        let newans = await addanswer(ans);
+        newans.toshow = true;
+        socket.emit('newAnswer', newans);
         setAnswer('');
-        setAllanswer(answers.answers);
     }
 
     const handleUpvote = async () => {
@@ -55,7 +60,8 @@ function MainQuestion({ id }) {
                     setUserHasUpvoted(true);
                     setUserHasDownvoted(false);
                 }
-                setLike(len);
+                let data = { count: len, question: id };
+                socket.emit('toggleVote', data);
             }
             else {
                 alert("you already voted the question");
@@ -78,7 +84,8 @@ function MainQuestion({ id }) {
                     setUserHasDownvoted(true);
                     setUserHasUpvoted(false);
                 }
-                setLike(len);
+                let data = { count: len, question: id };
+                socket.emit('toggleVote', data);
             }
             else {
                 alert("you already voted the question");
@@ -98,11 +105,11 @@ function MainQuestion({ id }) {
                 body: comment,
                 question: id
             }
-            await addComment(com);
-            const comnt = await AllcommentsByQuestion(id);
+            let newcmnt = await addComment(com);
+            newcmnt.toshow = true;
+            socket.emit('newComment', newcmnt);
             setComment('');
             setshow(false);
-            setAllComments(comnt.comments);
         } catch (error) {
             console.error('Error adding comment:', error);
         }
@@ -123,18 +130,18 @@ function MainQuestion({ id }) {
     const handleCommentDelete = async (cid) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this Comment?');
         if (confirmDelete) {
-            await deleteComment(cid);
-            const cmnts = await AllcommentsByQuestion(id);
-            setAllComments(cmnts.comments);
+            let deletedcmnt = await deleteComment(cid);
+            deletedcmnt.toshow = false;
+            socket.emit('deleteComment', deletedcmnt);
         }
     };
 
     const handleAnswerDelete = async (aid) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this Answer?');
         if (confirmDelete) {
-            await deleteAnswer(aid);
-            const anss = await fetchAllAnswers(id);
-            setAllanswer(anss.answers);
+            let deletedans = await deleteAnswer(aid);
+            deletedans.toshow = false;
+            socket.emit('deleteAnswer', deletedans);
         }
     };
 
@@ -167,11 +174,48 @@ function MainQuestion({ id }) {
         };
 
         fetchData();
+
+        // Listen for new comments
+        socket.on('liveComments', (comment) => {
+            if (comment.question === id) {
+                if (comment.toshow === true) {
+                    setAllComments((prevComments) => [...prevComments, comment]);
+                }
+                else {
+                    setAllComments((prevComments) => prevComments.filter((cmnt) => cmnt._id !== comment._id));
+                }
+            }
+        });
+
+        // Listen for new answers
+        socket.on('liveAnswers', (answer) => {
+            if (answer.question === id) {
+                if (answer.toshow === true) {
+                    setAllanswer((prevAnswers) => [...prevAnswers, answer]);
+                }
+                else {
+                    setAllanswer((prevAnswers) => prevAnswers.filter((ans) => ans._id !== answer._id));
+                }
+            }
+        });
+
+        // Listen for vote toggles
+        socket.on('liveVotes', (data) => {
+            if (data.question === id) {
+                setLike(data.count);
+            }
+        });
+
+        return () => {
+            socket.off('liveComments');
+            socket.off('liveAnswers');
+            socket.off('liveVotes');
+        };
+
     }, [id]);
 
     useEffect(() => {
     }, [allanswer, allcomments, like]);
-
 
     return (
         <div className='main'>
@@ -195,7 +239,7 @@ function MainQuestion({ id }) {
                     <div className='info'>
 
                         <p>
-                            {(authUser.email === 'moderator.hotfix@gmail.com' || owner.email === authUser.email) && (
+                            {(owner.email === authUser.email) && (
                                 <IconButton onClick={() => handleEditQuestion(id)}>
                                     <EditIcon />
                                 </IconButton>
@@ -203,7 +247,7 @@ function MainQuestion({ id }) {
                         </p>
 
                         <p>
-                            {(authUser.email === 'moderator.hotfix@gmail.com' || owner.email === authUser.email) && (
+                            {(owner.email === authUser.email) && (
                                 <IconButton onClick={() => handleQuestionDelete(ques._id)}>
                                     <DeleteIcon />
                                 </IconButton>
@@ -246,7 +290,7 @@ function MainQuestion({ id }) {
                                             </p>
 
                                             <p>
-                                                {(authUser.email === 'moderator.hotfix@gmail.com' || cmnt.email === authUser.email) && (
+                                                {(cmnt.email === authUser.email) && (
 
                                                     <Link onClick={() => handleCommentDelete(cmnt._id)} className="delete-link">delete</Link>
 
@@ -300,12 +344,8 @@ function MainQuestion({ id }) {
                         <div className='all-questions-container' key={index}>
                             <div className='all-questions-left' style={{ width: "1.5%" }}>
                                 <div className='all-options' >
-                                    {/* <IconButton onClick={() => handleAnswerDelete(answer._id)} aria-label="delete">
-                                                <DeleteIcon />
-                                            </IconButton> */}
-
                                     <p>
-                                        {(authUser.email === 'moderator.hotfix@gmail.com' || answer.email === authUser.email) && (
+                                        {(answer.email === authUser.email) && (
 
                                             <img src="/deleteicon2.png" alt="Delete Icon" className="delete-icon" onClick={() => handleAnswerDelete(answer._id)} />
                                         )}
