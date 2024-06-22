@@ -1,22 +1,18 @@
-import {backendUrl} from "./Config";
-import { getToken } from "./Config";
+import { backendUrl } from "./Config";
 
 export const addquestion = async (question) => {
     try {
-        //console.log(question);
-        const token = getToken();
-        //console.log(token);
-       const response = await fetch(`${backendUrl}/codehub/question/create`, {
+        const response = await fetch(`${backendUrl}/codehub/question/create`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(question),
         });
         const formattedResponse = await response.json();
         return formattedResponse;
-        
+
     } catch (error) {
         throw new Error(`Error creating question: ${error.message}`);
     }
@@ -24,19 +20,18 @@ export const addquestion = async (question) => {
 
 export const updateQuestion = async (id, question) => {
     try {
-        const token = getToken();
-       const response = await fetch(`${backendUrl}/codehub/question/update/${id}`, {
+        const response = await fetch(`${backendUrl}/codehub/question/update/${id}`, {
             method: "PUT",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(question),
         });
-        
+
         const formattedResponse = await response.json();
         return formattedResponse;
-        
+
     } catch (error) {
         throw new Error(`Error updating question: ${error.message}`);
     }
@@ -44,17 +39,16 @@ export const updateQuestion = async (id, question) => {
 
 export const deleteQuestion = async (id) => {
     try {
-        const token = getToken();
-       const response = await fetch(`${backendUrl}/codehub/question/delete/${id}`, {
+        const response = await fetch(`${backendUrl}/codehub/question/delete/${id}`, {
             method: "DELETE",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
         });
         const formattedResponse = await response.json();
         return formattedResponse;
-        
+
     } catch (error) {
         throw new Error(`Error deleting question: ${error.message}`);
     }
@@ -64,7 +58,7 @@ export const getAllQuestions = async () => {
     try {
         const response = await fetch(`${backendUrl}/codehub/question`, {
             method: "GET",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json"
             },
         });
@@ -74,10 +68,9 @@ export const getAllQuestions = async () => {
         }
 
         const formattedResponse = await response.json();
-        //console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
-       console.error("Error fetching question:", error);
+        console.error("Error fetching question:", error);
         throw new Error(`Error fetching question: ${error.message}`);
     }
 }
@@ -86,7 +79,7 @@ export const getQuestionById = async (id) => {
     try {
         const response = await fetch(`${backendUrl}/codehub/question/${id}`, {
             method: "GET",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json"
             },
         });
@@ -96,7 +89,6 @@ export const getQuestionById = async (id) => {
         }
 
         const formattedResponse = await response.json();
-    //    console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching question:", error);
@@ -107,13 +99,11 @@ export const getQuestionById = async (id) => {
 
 export const upvoteQuestion = async (id) => {
     try {
-        const token = getToken();
-       // console.log(token);
         const response = await fetch(`${backendUrl}/codehub/question/upvote/${id}`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
         });
 
@@ -122,7 +112,6 @@ export const upvoteQuestion = async (id) => {
         }
 
         const formattedResponse = await response.json();
-       //console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching question:", error);
@@ -132,13 +121,11 @@ export const upvoteQuestion = async (id) => {
 
 export const getvoteQuestion = async (id) => {
     try {
-        const token = getToken();
-        //console.log(token);
         const response = await fetch(`${backendUrl}/codehub/question/getvote/${id}`, {
             method: "GET",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
         });
 
@@ -147,7 +134,6 @@ export const getvoteQuestion = async (id) => {
         }
 
         const formattedResponse = await response.json();
-       //console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching question:", error);
@@ -158,13 +144,11 @@ export const getvoteQuestion = async (id) => {
 
 export const downvoteQuestion = async (id) => {
     try {
-        const token = getToken();
-       // console.log(token);
         const response = await fetch(`${backendUrl}/codehub/question/downvote/${id}`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
         });
 
@@ -173,7 +157,6 @@ export const downvoteQuestion = async (id) => {
         }
 
         const formattedResponse = await response.json();
-       //console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching question:", error);
@@ -187,7 +170,7 @@ export const fetchQuestionsOfaUser = async (id) => {
     try {
         const response = await fetch(`${backendUrl}/codehub/question/owner/${id}`, {
             method: "GET",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json"
             },
         });
@@ -197,7 +180,6 @@ export const fetchQuestionsOfaUser = async (id) => {
         }
 
         const formattedResponse = await response.json();
-        //console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching answer:", error);

@@ -6,13 +6,10 @@
 
 .cp-index-content{
     display: flex;
-  width: 100%;
-  /* align-items: center; */
-  justify-content: center;
+    width: 100%;
+    justify-content: center;
+    margin-left: 150px;
 }
-
-
-
 
 .user-profile-container {
     margin: 0 auto;

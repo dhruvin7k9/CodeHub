@@ -40,7 +40,7 @@ function MainBlog({ id }) {
                 }
                 let newcmnt = await addComment(com);
                 newcmnt.toshow = true;
-                socket.emit('newComment', newcmnt);
+                socket.emit('newCommentBlog', newcmnt);
                 setComment('');
                 setshow(false);
             }
@@ -66,7 +66,7 @@ function MainBlog({ id }) {
         if (confirmDelete) {
             let deletedcmnt = await deleteComment(cid);
             deletedcmnt.toshow = false;
-            socket.emit('deleteComment', deletedcmnt);
+            socket.emit('deleteCommentBlog', deletedcmnt);
         }
     };
 
@@ -88,7 +88,7 @@ function MainBlog({ id }) {
                     setUserHasDownvoted(false);
                 }
                 let data = { count: len, question: id };
-                socket.emit('toggleVote', data);
+                socket.emit('toggleVoteBlog', data);
             }
             else {
                 alert("you already voted the blog");
@@ -112,7 +112,7 @@ function MainBlog({ id }) {
                     setUserHasUpvoted(false);
                 }
                 let data = { count: len, blog: id };
-                socket.emit('toggleVote', data);
+                socket.emit('toggleVoteBlog', data);
             }
             else {
                 alert("you already voted the blog");
@@ -152,7 +152,7 @@ function MainBlog({ id }) {
         fetchData();
 
         // Listen for new comments
-        socket.on('liveComments', (comment) => {
+        socket.on('liveCommentsBlog', (comment) => {
             if (comment.blog === id) {
                 if (comment.toshow === true) {
                     setAllComments((prevComments) => [...prevComments, comment]);
@@ -164,15 +164,15 @@ function MainBlog({ id }) {
         });
 
         // Listen for vote toggles
-        socket.on('liveVotes', (data) => {
+        socket.on('liveVotesBlog', (data) => {
             if (data.blog === id) {
                 setLike(data.count);
             }
         });
 
         return () => {
-            socket.off('liveComments');
-            socket.off('liveVotes');
+            socket.off('liveCommentsBlog');
+            socket.off('liveVotesBlog');
         };
 
     }, [id]);

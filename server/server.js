@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+
 const app = express();
 const path = require("path");
 const JwtStrategy = require("passport-jwt").Strategy,
@@ -17,6 +19,7 @@ const userRouter = require("./routes/UserRoutes.js");
 const answerRouter = require("./routes/AnswerRoutes.js");
 const commentRouter = require("./routes/CommentRoutes.js");
 const blogRouter = require("./routes/BlogRoutes.js");
+const { extractJwtFromCookie } = require("./utils/helpers.js");
 
 const PORT = process.env.PORT || 80
 
@@ -35,6 +38,7 @@ const io = socketIo(server, {
 app.use(bodyParser.json({limit: "50mb"}))
 app.use(bodyParser.urlencoded({ extended : true, limit: "50mb"}))
 app.use(express.json())
+app.use(cookieParser());
 
 // Headers
 app.use((req, res, next) => {
@@ -43,13 +47,14 @@ app.use((req, res, next) => {
 
     if (allowedOrigins.includes(origin)) {
         res.header("Access-Control-Allow-Origin", origin);
+        res.header("Access-Control-Allow-Credentials", true);
     }
 
     next()
 })
 
 let opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.jwtFromRequest = extractJwtFromCookie;
 opts.secretOrKey = "thisKeyIsSupposedToBeSecret";
 passport.use(
     new JwtStrategy(opts, async function (jwt_payload, done) {
@@ -96,6 +101,14 @@ io.on('connection', (socket) => {
         io.emit('liveComments', comment);
     });
 
+    socket.on('newCommentBlog', (comment) => {
+        io.emit('liveCommentsBlog', comment);
+    });
+
+    socket.on('deleteCommentBlog', (comment) => {
+        io.emit('liveCommentsBlog', comment);
+    });
+
     socket.on('newAnswer', (answer) => {
         io.emit('liveAnswers', answer);
     });
@@ -106,6 +119,10 @@ io.on('connection', (socket) => {
 
     socket.on('toggleVote', (data) => {
         io.emit('liveVotes', data);
+    });
+
+    socket.on('toggleVoteBlog', (data) => {
+        io.emit('liveVotesBlog', data);
     });
 
     socket.on('disconnect', () => {

@@ -32,8 +32,11 @@ router.post(
                 commentDetails = { body, blog, user };
             }
 
-            const createcomment = await CommentModel.create(commentDetails);
-            return res.status(200).json(createcomment);
+            let createdcomment = await CommentModel.create(commentDetails);
+            createdcomment = createdcomment.toObject();
+            createdcomment.name = req.user.username;
+            createdcomment.email = req.user.email;
+            return res.status(200).json(createdcomment);
         } catch (error) {
             console.error("Error creating comment");
             return res.status(500).json({ error: "Error creating comment" });

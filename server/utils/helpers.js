@@ -1,8 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-exports = {};
-
-exports.getToken = async (email, user) => {
+exports.getToken = async (user) => {
     
     const token = jwt.sign(
         {identifier: user._id},
@@ -11,4 +9,10 @@ exports.getToken = async (email, user) => {
     return token;
 };
 
-module.exports = exports;
+exports.extractJwtFromCookie = (req) => {
+    let token = null;
+    if (req && req.cookies) {
+        token = req.cookies['token'];
+    }
+    return token;
+}

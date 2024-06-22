@@ -7,9 +7,8 @@ import React, { useState } from "react";
 import { auth } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { createUser, loginUser } from '../../utils/ServerHelpers';
-import { useCookies } from 'react-cookie';
 import { IconButton } from '@material-ui/core';
-import { Visibility, VisibilityOff } from '@material-ui/icons';
+import { Height, Visibility, VisibilityOff } from '@material-ui/icons';
 
 const Auth = () => {
 
@@ -20,7 +19,6 @@ const Auth = () => {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [, setCookie, ] = useCookies(["token"]);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSwitch = () => {
@@ -50,18 +48,16 @@ const Auth = () => {
         .then(async (userCredential) => {
           const user = userCredential.user;
 
-          const additionalInfo = {
+          const userInfo = {
             email: user.email,
-            password: password,
             username: username,
           };
 
           // Create user in backend
-          await createUser(additionalInfo)
+          await createUser(userInfo)
             .then((data) => {
               localStorage.setItem('userData', JSON.stringify(data));
               setLoading(false);
-              setCookie("token", data.token, { path: "/", maxAge: 60 * 60 * 60 });
               navigate('/');
             })
             .catch((error) => {
@@ -89,17 +85,15 @@ const Auth = () => {
       await signInWithEmailAndPassword(auth, email, password).then(async (userCredential) => {
         const user = userCredential.user;
 
-        const additionalInfo = {
-          email: user.email,
-          password: password,
+        const userInfo = {
+          email: user.email
         };
 
         // log user in backend
-        await loginUser(additionalInfo)
+        await loginUser(userInfo)
           .then((data) => {
             localStorage.setItem('userData', JSON.stringify(data));
             setLoading(false);
-            setCookie("token", data.token, { path: "/", maxAge: 60 * 60 * 60 });
             navigate('/');
 
           })
@@ -122,7 +116,7 @@ const Auth = () => {
     <section className='auth-section'>
 
       <div className='auth-container'>
-        {!isSignup && <img src="/hotfixlogo.jpg" style={{borderRadius:'50%'}} alt='logo' className='login-logo' />}
+        {!isSignup && <img src="/askmedev.jpg" style={{borderRadius:'50%', height:250, width:300}} alt='logo' className='login-logo' />}
         <form>
           {
             isSignup && (

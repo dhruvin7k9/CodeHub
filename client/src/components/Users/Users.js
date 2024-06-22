@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Users.css';
-import { getAllUsers } from '../../utils/UsersHelper';
+import { getAllUsers } from '../../utils/UserHelper';
 import { Link } from 'react-router-dom';
 import Sidebar from '../Cpform/Sidebar';
 import { Avatar } from '@mui/material';

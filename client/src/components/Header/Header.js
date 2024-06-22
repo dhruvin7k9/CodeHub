@@ -6,11 +6,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { getAllUsers } from '../../utils/UserHelper.js';
 import { getAllQuestions } from '../../utils/QuestionHelper.js';
 import { getAllBlogs } from '../../utils/BlogHelper.js';
+import { logoutAndClearCookie } from '../../utils/ServerHelpers.js';
 import { signOut } from "firebase/auth";
 import { auth } from '../../firebase.js';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../features/userSlice.js';
-import { useCookies } from 'react-cookie';
 import Modal from 'react-modal';
 // Modal.setAppElement('#root');
 
@@ -138,13 +138,12 @@ function SearchComponent() {
 function Header() {
   const user = useSelector(selectUser);
   const navigate = useNavigate();
-  const [, , removeCookie] = useCookies(["token"]);
   const userData = JSON.parse(localStorage.getItem('userData'));
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      removeCookie("token");
+      await logoutAndClearCookie();
       localStorage.removeItem('userData');
       navigate('/auth');
     } catch (error) {
@@ -158,7 +157,7 @@ function Header() {
 
         <div className='header-left'>
           <Link to='/' className='headerlink'>
-            <img src="\hotfixlogo.jpg" alt='logo' style={{ borderRadius: '50%', width: '50px', height: '50px' }} />
+            <img src="\askmedevlogo.jpg" alt='logo' style={{ borderRadius: '50%', width: '55px', height: '50px' }} />
           </Link>
           <span>AskMeDev</span>
         </div>

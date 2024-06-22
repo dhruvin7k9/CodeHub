@@ -37,7 +37,7 @@ function Sidebar() {
 
                         <p className='link-platform'>
                             <Apps className='icon' />
-                            Platforms
+                            Coding platforms :
                         </p>
                         
 

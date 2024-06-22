@@ -6,12 +6,10 @@
 
 .cp-index-content-user{
     display: flex;
-  width: 100%;
-  justify-content: center; 
-  margin-left: 150px;
+    width: 100%;
+    justify-content: center; 
+    margin-left: 150px;
 }
-
-
 
 .users-container {
     /* flex: 1; */
@@ -21,13 +19,14 @@
     justify-content: flex-start;
     background-color: #e7eaec;
     height: 100%;
+    width: 100%;
     z-index: 0;
     flex-direction: row;
     align-items: flex-start;
 }
 
 .user-card {
-    width: 300px;
+    width: 200px;
     height: 100px;
     margin: 10px;
     padding: 5px;

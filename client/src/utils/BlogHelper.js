@@ -1,20 +1,18 @@
-import {backendUrl} from "./Config";
-import { getToken } from "./Config";
+import { backendUrl } from "./Config";
 
 export const addblog = async (blog) => {
     try {
-        const token = getToken();
-       const response = await fetch(`${backendUrl}/codehub/blog/create`, {
+        const response = await fetch(`${backendUrl}/codehub/blog/create`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(blog),
         });
         const formattedResponse = await response.json();
         return formattedResponse;
-        
+
     } catch (error) {
         throw new Error(`Error creating blog: ${error.message}`);
     }
@@ -22,19 +20,18 @@ export const addblog = async (blog) => {
 
 export const updateBlog = async (id, blog) => {
     try {
-        const token = getToken();
-       const response = await fetch(`${backendUrl}/codehub/blog/update/${id}`, {
+        const response = await fetch(`${backendUrl}/codehub/blog/update/${id}`, {
             method: "PUT",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(blog),
         });
-        
+
         const formattedResponse = await response.json();
         return formattedResponse;
-        
+
     } catch (error) {
         throw new Error(`Error updating blog: ${error.message}`);
     }
@@ -42,12 +39,11 @@ export const updateBlog = async (id, blog) => {
 
 export const incrementBlogView = async (id) => {
     try {
-        const token = getToken();
         const response = await fetch(`${backendUrl}/codehub/blog/incview/${id}`, {
             method: "PUT",
+            credentials: "include",
             headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
             },
         });
         const formattedResponse = await response.json();
@@ -59,17 +55,16 @@ export const incrementBlogView = async (id) => {
 
 export const deleteBlog = async (id) => {
     try {
-        const token = getToken();
-       const response = await fetch(`${backendUrl}/codehub/blog/delete/${id}`, {
+        const response = await fetch(`${backendUrl}/codehub/blog/delete/${id}`, {
             method: "DELETE",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
         });
         const formattedResponse = await response.json();
         return formattedResponse;
-        
+
     } catch (error) {
         throw new Error(`Error deleting blog: ${error.message}`);
     }
@@ -79,7 +74,7 @@ export const getAllBlogs = async () => {
     try {
         const response = await fetch(`${backendUrl}/codehub/blog`, {
             method: "GET",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json"
             },
         });
@@ -89,7 +84,6 @@ export const getAllBlogs = async () => {
         }
 
         const formattedResponse = await response.json();
-        //console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching blog:", error);
@@ -101,7 +95,7 @@ export const getBlogById = async (id) => {
     try {
         const response = await fetch(`${backendUrl}/codehub/blog/${id}`, {
             method: "GET",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json"
             },
         });
@@ -111,7 +105,6 @@ export const getBlogById = async (id) => {
         }
 
         const formattedResponse = await response.json();
-       //console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching blog:", error);
@@ -122,13 +115,11 @@ export const getBlogById = async (id) => {
 
 export const upvoteBlog = async (id) => {
     try {
-        const token = getToken();
-       // console.log(token);
         const response = await fetch(`${backendUrl}/codehub/blog/upvote/${id}`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
         });
 
@@ -137,7 +128,6 @@ export const upvoteBlog = async (id) => {
         }
 
         const formattedResponse = await response.json();
-    //    console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching blog:", error);
@@ -147,13 +137,11 @@ export const upvoteBlog = async (id) => {
 
 export const getvoteBlog = async (id) => {
     try {
-        const token = getToken();
-        //console.log(token);
         const response = await fetch(`${backendUrl}/codehub/blog/getvote/${id}`, {
             method: "GET",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
         });
 
@@ -162,7 +150,6 @@ export const getvoteBlog = async (id) => {
         }
 
         const formattedResponse = await response.json();
-    //    console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching blog:", error);
@@ -173,13 +160,11 @@ export const getvoteBlog = async (id) => {
 
 export const downvoteBlog = async (id) => {
     try {
-        const token = getToken();
-       // console.log(token);
         const response = await fetch(`${backendUrl}/codehub/blog/downvote/${id}`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
             },
         });
 
@@ -188,7 +173,6 @@ export const downvoteBlog = async (id) => {
         }
 
         const formattedResponse = await response.json();
-       //console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching blog:", error);
@@ -201,7 +185,7 @@ export const fetchBlogsOfaUser = async (id) => {
     try {
         const response = await fetch(`${backendUrl}/codehub/blog/owner/${id}`, {
             method: "GET",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json"
             },
         });
@@ -211,7 +195,6 @@ export const fetchBlogsOfaUser = async (id) => {
         }
 
         const formattedResponse = await response.json();
-        //console.log("Response from backend:", formattedResponse);
         return formattedResponse;
     } catch (error) {
         console.error("Error fetching answer:", error);

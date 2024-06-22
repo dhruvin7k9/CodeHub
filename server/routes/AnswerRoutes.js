@@ -18,7 +18,10 @@ router.post(
         }
         const user = req.user._id;
         const answerdetails = {body, question, user };
-        const createanswer = await AnswerModel.create(answerdetails);
+        let createanswer = await AnswerModel.create(answerdetails);
+        createanswer = createanswer.toObject();
+        createanswer.name = req.user.username;
+        createanswer.email = req.user.email;
         return res.status(200).json(createanswer);
     }
     catch(error){  

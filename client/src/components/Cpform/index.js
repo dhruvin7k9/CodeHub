@@ -7,7 +7,7 @@ function Index() {
 
   return (
     <div className='cp-index'>
-      <div className='cp-index-content'>
+      <div className='cp-content'>
         <Sidebar />
         <Main />
       </div>

@@ -58,7 +58,6 @@ router.put(
         try {
         const { id } = req.params;
         const { username, bio } = req.body;
-        // const hashPassword = await bcrypt.hash(password, 12);
         const updatedusr = await UserModel.findByIdAndUpdate(id, {username: username, bio: bio}, { new: true });
         return res.status(200).json(updatedusr);
     }catch(error){
@@ -79,7 +78,7 @@ router.delete(
         await QuestionModel.deleteMany({ user: id });
         await AnswerModel.deleteMany({ user: id });
         await CommentModel.deleteMany({ user: id });
-        return res.status(200).json(deletedusr);
+        return res.status(200).clearCookie('token', {httpOnly:true}).json(deletedusr);
     }catch(error){
         console.error("Error deleting user");
         return res.status(500).json({ error: "Error deleting user" });
