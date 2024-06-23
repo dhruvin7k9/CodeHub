@@ -11,7 +11,7 @@ function Index() {
 
   return (
     <div className='cp-index'>
-      <div className='cp-index-content'>
+      <div className='cp-index-content' style={{marginLeft:-16}}>
         <Sidebar />
         <MainBlog id={id}/>
       </div>
